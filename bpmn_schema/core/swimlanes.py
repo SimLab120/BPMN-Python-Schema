@@ -141,3 +141,61 @@ class Pool(BPMNElement):
         """
         Add a lane to this pool.
         
+        Args:
+            lane (Lane): Lane to add
+        """
+        self.lanes.append(lane)
+    
+    def remove_lane(self, lane_id: str) -> None:
+        """
+        Remove a lane from this pool.
+        
+        Args:
+            lane_id (str): ID of the lane to remove
+        """
+        self.lanes = [lane for lane in self.lanes if lane.id != lane_id]
+    
+    def get_lane_by_id(self, lane_id: str) -> Optional[Lane]:
+        """
+        Get a lane by its ID.
+        
+        Args:
+            lane_id (str): ID of the lane to find
+            
+        Returns:
+            Optional[Lane]: Lane if found, None otherwise
+        """
+        for lane in self.lanes:
+            if lane.id == lane_id:
+                return lane
+        return None
+    
+    def has_lanes(self) -> bool:
+        """Check if this pool has lanes."""
+        return len(self.lanes) > 0
+    
+    def get_all_flow_nodes(self) -> List[str]:
+        """
+        Get all flow node references in this pool.
+        
+        Returns:
+            List[str]: All flow node IDs in all lanes
+        """
+        all_nodes = []
+        for lane in self.lanes:
+            all_nodes.extend(lane.get_all_flow_nodes())
+        return all_nodes
+    
+    def __str__(self) -> str:
+        """String representation of the pool."""
+        lane_count = len(self.lanes)
+        executable_info = " (executable)" if self.is_executable else ""
+        return f"Pool '{self.name}' [{lane_count} lanes]{executable_info}"
+    
+    class Config:
+        """Pydantic configuration for Pool elements."""
+        validate_assignment = True
+
+
+# Update forward references
+Lane.model_rebuild()
